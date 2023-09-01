@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${type}">sudoku</title>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: sans-serif;
+      background-color: #f1f1f1;
+    }
+    main {
+      width: 100%;
+      max-width: 90%;
+      margin: auto;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      grid-template-rows: repeat(9, 1fr);
+      grid-gap: 0.5rem;
+      width: 420px;
+      height: 420px;
+      margin: auto;
+      padding: 0.5rem;
+      background-color: black;
+      border-radius: 0.5rem;
+      position: relative;
+    }
+    .horizontals, .verticals {
+      position: absolute;
+      z-index: 10; 
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .horizontals > *{
+      height: 0.1rem;
+      background-color: white;
+    }
+    
+    input {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 0.25rem;
+      font-size: 1.5rem;
+      text-align: center;
+      background-color: #f1f1f1;
+    }
+  </style>
+  <body>
+    <main>
+      <h1>
+        <span th:text="${type}"> </span>
+        sudoku board
+      </h1>
+
+      <form action="#" th:action="${isPlay} ? @{'/sudoku/valid/' + ${id}} : @{'/sudoku/check'}" method="post" id="sudoku-form" >
+        <div class="board">
+          <input
+            type="text"
+            maxlength="1"
+            th:each="char,iterStat : ${board}"
+            th:name = "${iterStat.index}"
+            th:value="${char}"/>
+        </div>
+        <button type="submit">Submit</button>
+      </form>
+      <p th:text="${error}"></p>
+
+      <div th:unless="${play}">
+        <a th:href="@{${link}}">
+          <p th:text="${link}"></p>
+        </a>
+      </div>
+
+      <p th:text="${message}"></p>
+    </main>
+  </body>
+</html>
