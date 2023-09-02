@@ -13,7 +13,7 @@
     }
     body {
       font-family: sans-serif;
-      background-color: #f1f1f1;
+      background-color: #fff;
     }
     main {
       width: 100%;
@@ -26,41 +26,45 @@
       justify-content: center;
     }
     .board {
-      display: grid;
-      grid-template-columns: repeat(9, 1fr);
-      grid-template-rows: repeat(9, 1fr);
-      grid-gap: 0.5rem;
       width: 420px;
       height: 420px;
-      margin: auto;
-      padding: 0.5rem;
-      background-color: black;
-      border-radius: 0.5rem;
-      position: relative;
+      display: grid;
+      border: 2px solid #000;
+      grid-template-columns: repeat(9, 1fr);
+      grid-template-rows: repeat(9, 1fr);
     }
-    .horizontals, .verticals {
-      position: absolute;
-      z-index: 10; 
-      top: 0;
-      left: 0;
+    .cell {
+      border: 1px solid #000000cb;
       width: 100%;
       height: 100%;
-    }
-
-    .horizontals > *{
-      height: 0.1rem;
-      background-color: white;
-    }
-    
-    input {
-      width: 100%;
-      height: 100%;
-      border: none;
-      border-radius: 0.25rem;
       font-size: 1.5rem;
       text-align: center;
-      background-color: #f1f1f1;
+      cursor: pointer;
     }
+    .cell:hover {
+      background-color: #0000001a;
+    }
+    .cell:focus {
+      outline: none;
+      background-color: #0000001a;
+    }
+
+    .cell:nth-child(3n):not(:nth-child(9n)) {
+      border-right: 2px solid #000;
+    }
+
+    .cell:nth-child(27n + 28),
+    .cell:nth-child(27n + 29),
+    .cell:nth-child(27n + 30),
+    .cell:nth-child(27n + 31),
+    .cell:nth-child(27n + 32),
+    .cell:nth-child(27n + 33),
+    .cell:nth-child(27n + 34),
+    .cell:nth-child(27n + 35),
+    .cell:nth-child(27n + 36) {
+      border-top: 2px solid #000;
+    }
+    
   </style>
   <body>
     <main>
@@ -69,14 +73,21 @@
         sudoku board
       </h1>
 
-      <form action="#" th:action="${isPlay} ? @{'/sudoku/valid/' + ${id}} : @{'/sudoku/check'}" method="post" id="sudoku-form" >
+      <form
+        action="#"
+        th:action="${isPlay} ? @{'/sudoku/valid/' + ${id}} : @{'/sudoku/check'}"
+        method="post"
+        id="sudoku-form"
+      >
         <div class="board">
           <input
             type="text"
             maxlength="1"
+            class="cell"
             th:each="char,iterStat : ${board}"
-            th:name = "${iterStat.index}"
-            th:value="${char}"/>
+            th:name="${iterStat.index}"
+            th:value="${char}"
+          />
         </div>
         <button type="submit">Submit</button>
       </form>
@@ -87,8 +98,17 @@
           <p th:text="${link}"></p>
         </a>
       </div>
-
-      <p th:text="${message}"></p>
     </main>
+
+    <script>
+      document.querySelectorAll(".cell").forEach((cell) => {
+        if (cell.value === ".") {
+          cell.value = "";
+        } else {
+          cell.readOnly = true;
+          cell.style.backgroundColor = "#0000001a";
+        }
+      })
+    </script>
   </body>
 </html>

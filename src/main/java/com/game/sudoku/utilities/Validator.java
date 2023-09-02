@@ -12,7 +12,7 @@ public class Validator {
         for (int i = 0; i < 9; i++) {
             if (temp.contains(board[row][i])) return false;
 
-            if (board[row][i] != ' ') {
+            if (board[row][i] != '.') {
                 temp.add(board[row][i]);
             }
         }
@@ -26,7 +26,7 @@ public class Validator {
         for (int i = 0; i < 9; i++) {
             if (temp.contains(board[i][col])) return false;
 
-            if (board[i][col] != ' ') {
+            if (board[i][col] != '.') {
                 temp.add(board[i][col]);
             }
         }
@@ -43,7 +43,7 @@ public class Validator {
                 
                 if (temp.contains(curr)) return false;
 
-                if (curr != ' ') temp.add(curr);
+                if (curr != '.') temp.add(curr);
             }
         }
         return true;

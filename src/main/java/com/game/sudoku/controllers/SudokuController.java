@@ -1,10 +1,6 @@
 package com.game.sudoku.controllers;
 
-import java.net.http.HttpRequest;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,8 +16,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.game.sudoku.entities.Sudoku;
 import com.game.sudoku.repositories.SudokuRepository;
 import com.game.sudoku.utilities.Validator;
-
-import jakarta.annotation.PostConstruct;
 
 @Controller
 @RequestMapping("/sudoku")
@@ -39,33 +33,28 @@ public class SudokuController {
     @Autowired
     private Sudoku sudoku;
 
-    @PostConstruct
-    public void init() {
-        String boardText = " ".repeat(81);
-        sudoku.setBoardText(boardText);
-    }
-
     @GetMapping("/create")
     public String create(Model model) {
-        model.addAttribute("isPlay", false);
-        model.addAttribute("board", sudoku.getBoardText().toCharArray());
+        model.addAttribute("board", ".".repeat(81).toCharArray());
         model.addAttribute("type", "create");
+        model.addAttribute("isPlay", false);
         return "sudoku";
     }
 
     @PostMapping("/check")
     public String createSubmit(@RequestParam Map<String, String> paramMap, Model model, RedirectAttributes attr) {
-        // String boardText = paramMap.values().stream().collect(Collectors.joining());
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 81; i++) {
             String val = paramMap.get(String.valueOf(i));
+            val = val.equals("") ? "." : val;
             sb.append(val);
         }
         String boardText = sb.toString();
-
+        System.out.println(boardText);
         if (validator.isValidConfig(boardText)) {
             sudoku.setBoardText(boardText);
             sudokuRepository.save(sudoku);
+            attr.addFlashAttribute("board", boardText.toCharArray());
             attr.addFlashAttribute("link", String.format("http://localhost:%d/sudoku/%d", port, sudoku.getId()));
         } else {
             attr.addFlashAttribute("error", "not a valid board");
@@ -88,6 +77,7 @@ public class SudokuController {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 81; i++) {
             String val = paramMap.get(String.valueOf(i));
+            val = val.equals("") ? "." : val;
             sb.append(val);
         }
         String boardText = sb.toString();
@@ -95,7 +85,7 @@ public class SudokuController {
         if (!validator.isValidConfig(boardText)) {
             attr.addFlashAttribute("error", "not a valid board");
         } else {
-            
+
             sudoku.setBoardText(boardText);
             sudokuRepository.save(sudoku);
         }

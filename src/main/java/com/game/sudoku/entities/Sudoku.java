@@ -18,5 +18,5 @@ public class Sudoku {
     private int id;
     
     @Column
-    private String boardText;
+    private String boardText = ".".repeat(81);
 }
