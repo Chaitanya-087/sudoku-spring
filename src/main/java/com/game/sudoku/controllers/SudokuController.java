@@ -35,14 +35,12 @@ public class SudokuController {
 
     @GetMapping("/create")
     public String create(Model model) {
-        model.addAttribute("board", ".".repeat(81).toCharArray());
-        model.addAttribute("type", "create");
-        model.addAttribute("isPlay", false);
-        return "sudoku";
+        model.addAttribute("board", sudoku.getBoardText().toCharArray());
+        return "form";
     }
 
     @PostMapping("/check")
-    public String createSubmit(@RequestParam Map<String, String> paramMap, Model model, RedirectAttributes attr) {
+    public String createSubmit(@RequestParam Map<String, String> paramMap, RedirectAttributes attr) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 81; i++) {
             String val = paramMap.get(String.valueOf(i));
@@ -50,14 +48,12 @@ public class SudokuController {
             sb.append(val);
         }
         String boardText = sb.toString();
-        System.out.println(boardText);
         if (validator.isValidConfig(boardText)) {
             sudoku.setBoardText(boardText);
             sudokuRepository.save(sudoku);
-            attr.addFlashAttribute("board", boardText.toCharArray());
             attr.addFlashAttribute("link", String.format("http://localhost:%d/sudoku/%d", port, sudoku.getId()));
         } else {
-            attr.addFlashAttribute("error", "not a valid board");
+            attr.addFlashAttribute("error", "not a valid configuration");
         }
         return "redirect:/sudoku/create";
     }
@@ -66,26 +62,23 @@ public class SudokuController {
     public String play(@PathVariable("id") int id, Model model) {
         Sudoku sudoku = sudokuRepository.findById(id).get();
         model.addAttribute("id", sudoku.getId());
-        model.addAttribute("isPlay", true);
         model.addAttribute("board", sudoku.getBoardText().toCharArray());
-        model.addAttribute("type", "play");
         return "sudoku";
     }
 
     @PostMapping("/valid/{id}")
     public String valid(@RequestParam Map<String, String> paramMap, @PathVariable int id, RedirectAttributes attr) {
-        StringBuilder sb = new StringBuilder();
+        String boardText = "";
+        Sudoku sudoku = sudokuRepository.findById(id).get();
         for (int i = 0; i < 81; i++) {
             String val = paramMap.get(String.valueOf(i));
-            val = val.equals("") ? "." : val;
-            sb.append(val);
+            boardText += val.equals("") ? "." : val;
         }
-        String boardText = sb.toString();
-        System.out.println(boardText);
-        if (!validator.isValidConfig(boardText)) {
-            attr.addFlashAttribute("error", "not a valid board");
+        if (boardText.contains(".")) {
+            attr.addFlashAttribute("error", "In complete solution not accepted");
+        } else if (!validator.isValidConfig(boardText)) {
+            attr.addFlashAttribute("error", "Invalid solution, please try again!");
         } else {
-
             sudoku.setBoardText(boardText);
             sudokuRepository.save(sudoku);
         }
